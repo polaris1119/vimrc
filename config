@@ -1,0 +1,1374 @@
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Maintainer: amix the lucky stiff
+"             http://amix.dk - amix@amix.dk
+"
+" Version: 3.6 - 25/08/10 14:40:30
+"
+" Blog_post:
+"       http://amix.dk/blog/post/19486#The-ultimate-vim-configuration-vimrc
+" Syntax_highlighted:
+"       http://amix.dk/vim/vimrc.html
+" Raw_version:
+"       http://amix.dk/vim/vimrc.txt
+"
+" How_to_Install_on_Unix:
+"    $ mkdir ~/.vim_runtime
+"    $ svn co svn://orangoo.com/vim ~/.vim_runtime
+"    $ cat ~/.vim_runtime/install.sh
+"    $ sh ~/.vim_runtime/install.sh <system>
+"      <sytem> can be `mac`, `linux` or `windows`
+"
+" How_to_Upgrade:
+"    $ svn update ~/.vim_runtime
+"
+" Sections:
+"    -> General
+"    -> VIM user interface
+"    -> Colors and Fonts
+"    -> Files and backups
+"    -> Text, tab and indent related
+"    -> Visual mode related
+"    -> Command mode related
+"    -> Moving around, tabs and buffers
+"    -> Statusline
+"    -> Parenthesis/bracket expanding
+"    -> General Abbrevs
+"    -> Editing mappings
+"
+"    -> Cope
+"    -> Minibuffer plugin
+"    -> Omni complete functions
+"    -> Python section
+"    -> JavaScript section
+"
+"
+" Plugins_Included:
+"     > minibufexpl.vim - http://www.vim.org/scripts/script.php?script_id=159
+"       Makes it easy to get an overview of buffers:
+"           info -> :e ~/.vim_runtime/plugin/minibufexpl.vim
+"
+"     > bufexplorer - http://www.vim.org/scripts/script.php?script_id=42
+"       Makes it easy to switch between buffers:
+"           info -> :help bufExplorer
+"
+"     > yankring.vim - http://www.vim.org/scripts/script.php?script_id=1234
+"       Emacs's killring, useful when using the clipboard:
+"           info -> :help yankring
+"
+"     > surround.vim - http://www.vim.org/scripts/script.php?script_id=1697
+"       Makes it easy to work with surrounding text:
+"           info -> :help surround
+"
+"     > snipMate.vim - http://www.vim.org/scripts/script.php?script_id=2540
+"       Snippets for many languages (similar to TextMate's):
+"           info -> :help snipMate
+"
+"     > mru.vim - http://www.vim.org/scripts/script.php?script_id=521
+"       Plugin to manage Most Recently Used (MRU) files:
+"           info -> :e ~/.vim_runtime/plugin/mru.vim
+"
+"     > Command-T - http://www.vim.org/scripts/script.php?script_id=3025
+"       Command-T plug-in provides an extremely fast, intuitive mechanism for opening filesa:
+"           info -> :help CommandT
+"           screencast and web-help -> http://amix.dk/blog/post/19501
+"
+"     > authorinfo - http://www.vim.org/scripts/script.php?script_id=2902
+"     You can add your author info in any source files,such as cpp,c,java,and c#,python,php,bash....
+"     Like this:
+"/*=============================================================================
+"#  Author:          dantezhu - http://www.vimer.cn
+"#  Email:           zny2008@gmail.com
+"#  FileName:        test2.cpp
+"#  Description:
+"#  Version:         0.0.1
+"#  LastChange:      2011-02-15 19:32:25
+"#  History:
+"=============================================================================*/
+"
+"	> 增加PHP JS CSS的函数字典
+"
+"
+"  Revisions:
+"     > 3.6: Added lots of stuff (colors, Command-T, Vim 7.3 persistent undo etc.)
+"     > 3.5: Paste mode is now shown in status line  if you are in paste mode
+"     > 3.4: Added mru.vim
+"     > 3.3: Added syntax highlighting for Mako mako.vim
+"     > 3.2: Turned on python_highlight_all for better syntax
+"            highlighting for Python
+"     > 3.1: Added revisions ;) and bufexplorer.vim
+"
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Vundle plugin
+set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=$VIM/vimfiles/bundle/vundle/
+" call vundle#begin()
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('$VIM/vimfiles/bundle/')
+
+" let Vundle manage Vundle, required
+"Plugin 'gmarik/Vundle.vim'
+
+"Plugin 'fatih/vim-go'
+"Plugin 'majutsushi/tagbar'
+
+" All of your Plugins must be added before the following line
+"call vundle#end()            " required
+filetype plugin indent on    " required
+" To ignore plugin indent changes, instead use:
+"filetype plugin on
+"
+" Brief help
+" :PluginList       - lists configured plugins
+" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PluginSearch foo - searches for foo; append `!` to refresh local cache
+" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+"
+" see :h vundle for more details or wiki for FAQ
+" Put your non-Plugin stuff after this line
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Sets how many lines of history VIM has to remember
+set history=700
+
+" Enable filetype plugin
+" filetype on
+filetype plugin on
+filetype indent on
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
+" With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
+let mapleader = ","
+let g:mapleader = ","
+
+" Fast saving
+"nmap <leader>w :w!<cr>
+
+" Fast editing of the .vimrc
+"map <leader>e :e! ~/.vim_runtime/vimrc<cr>
+
+" When vimrc is edited, reload it
+"autocmd! bufwritepost vimrc source ~/.vim_runtime/vimrc
+
+"保存文件，同时删除最后可能增加的新行（启用保存文件总会变成unix）
+"==== Begin ===
+"set bin noeol
+function! SaveAsNOEOF(filename)
+	set bin noeol
+	let a=getline(1, line('$')-1)
+	call extend(a, getline('$', '$'))
+	call writefile(a, a:filename, 'b')
+	if a:filename == bufname('%')
+		set nomodified
+	endif
+endfunction
+
+function! SaveNOEOF()
+	call SaveAsNOEOF(bufname('%'))
+endfunction
+
+"command! -complete=file -nargs=0 SaveNOEOF :call SaveNOEOF()
+"command! -complete=file -nargs=1 SaveAsNOEOF :call SaveNOEOF(<q-args>)
+"===== End ====
+
+"保存文件，同时删除最后可能增加的新行
+function! NoeolAndWrite()
+	execute('normal :')
+	execute('set binary')
+	execute('normal :')
+	execute('set noeol')
+	execute('normal :')
+	execute('w!')
+endfunction
+
+nmap <leader>nw :call NoeolAndWrite()<cr>
+nmap <leader>w :w!<cr>
+
+" 强行退出
+nmap <leader>q :q!<cr>
+nmap <leader>x :xa!<cr>
+
+"修改配置文件后更新
+autocmd! bufwritepost _vimrc source %
+if has("win32")
+	"更新配置
+	map <leader>u :source $VIM\_vimrc<cr>
+	"编辑配置文件
+	map <leader>e :e $VIM\_vimrc<cr>
+else
+	"更新配置
+	map <leader>u :source $HOME/.vimrc<cr>
+	"编辑配置文件
+	map <leader>e :e $HOME/.vimrc<cr>
+	autocmd! bufwritepost _vimrc source $HOME/.vimrc<cr> "修改配置文件后更新
+endif
+
+" 文件被其他程序修改时自动载入
+set autoread
+
+" 文件格式配置
+if has("win32") || has("win64")
+	set fileformat=unix
+	set fileformats=unix,dos,mac
+elseif has("unix")
+	set fileformat=unix
+	set fileformats=unix,dos,mac
+else
+	set ff=mac
+	set ffs=mac,unix,doc
+endif
+
+nmap <leader>fd :set ff=dos<cr>
+nmap <leader>fu :set ff=unix<cr>
+
+" 删除行末的
+function! DeleteM()
+	execute("normal :")
+	execute("%s/ $//g")
+endfunction
+nmap <leader>dm :call DeleteM()<cr>
+
+nmap <leader>ud :e ++ff=dos<cr>
+nmap <leader>uu :e ++ff=unix<cr>
+
+" 打开文件时，总是跳到退出之前的光标处
+autocmd BufReadPost *
+\ if line("'\"") > 0 && line("'\"") <= line("$") |
+\   exe "normal! g`\"" |
+\ endif
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => VIM user interface
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Set 7 lines to the curors - when moving vertical..
+set so=7
+
+set wildmenu "Turn on WiLd menu
+
+set ruler "Always show current position
+
+"set cmdheight=2 "The commandbar height
+
+set hid "Change buffer - without saving
+
+" eol(end of line,最后加空行)
+set noeol
+"set binary " 开启会使fileformat等无效（见帮助）
+
+" Set backspace config
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+set ignorecase "Ignore case when searching
+set smartcase
+
+set hlsearch "Highlight search things
+
+set incsearch "Make search act like search in modern browsers
+set nolazyredraw "Don't redraw while executing macros
+
+set magic "Set magic on, for regular expressions
+
+set showmatch "Show matching bracets when text indicator is over them
+set mat=2 "How many tenths of a second to blink
+
+" No sound on errors
+set noerrorbells
+set novisualbell
+"set t_vb=
+"set vb t_vb=		" 在normal模式下再按esc时，屏幕会闪
+set tm=500
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Colors and Fonts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+syntax enable "Enable syntax hl
+
+function! MySys()
+  if has("win32")
+    return "windows"
+  else
+    return "linux"
+  endif
+endfunction
+
+" Set font according to system
+if MySys() == "mac"
+  set gfn=Menlo:h14
+  set shell=/bin/bash
+elseif MySys() == "windows"
+  set gfn=Courier_New:h14:cANSI
+elseif MySys() == "linux"
+  set gfn=Monospace\ 10
+  set shell=/bin/bash
+endif
+
+if has("gui_running")
+  "set guioptions-=T
+  set t_Co=256
+  "set background=dark
+  colorscheme my_color
+
+else
+  colorscheme zellner
+  set background=dark
+
+endif
+
+" 切换显示菜单栏和工具栏，默认不显示
+set guioptions-=m
+set guioptions-=T
+map <silent> <F6> :if &guioptions =~# 'T' <Bar>
+        \set guioptions-=T <Bar>
+        \set guioptions-=m <Bar>
+    \else <Bar>
+        \set guioptions+=T <Bar>
+        \set guioptions+=m <Bar>
+    \endif<CR>
+
+
+" 显示行号
+set nu
+
+" 显示相对行号
+" if exists('&relativenumber')
+"    set relativenumber
+" else
+"    set nu
+" endif
+
+let nuFlag = 1
+" 切换行号的不同显示方式
+function! ToggleNumber()
+	if exists('&relativenumber')
+		set norelativenumber
+		if g:nuFlag == 1
+			set su
+			let g:nuFlag = 0
+		else
+			set relativenumber
+			let g:nuFlag = 1
+		endif
+	else
+		set su
+	endif
+endfunction
+map <silent> <leader>nu :call ToggleNumber()<cr>
+
+set ruler
+
+" 解决打开utf8编码的html文件乱码的问题（否则版权符号之类的显示会有问题）。内部编码(encoding)改成utf8
+set encoding=utf-8
+
+set fileencodings=ucs-bom,utf-8,gbk,default,latin1
+
+if has("gui_running")
+    " 解决菜单乱码
+    source $VIMRUNTIME/delmenu.vim
+    set langmenu=zh_CN.UTF-8
+    source $VIMRUNTIME/menu.vim
+endif
+
+" vim提示信息乱码的解决
+language message zh_CN.UTF-8
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Files, backups and undo
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Turn backup off, since most stuff is in SVN, git anyway...
+set nobackup
+set nowb
+set noswapfile
+
+"Persistent undo
+try
+    if MySys() == "windows"
+      set undodir=C:\Windows\Temp
+    else
+      set undodir=~/.vim_runtime/undodir
+    endif
+
+	if exists('&undofile')
+		set undofile
+	endif
+catch
+endtry
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Text, tab and indent related
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" set expandtab       " 使用空格代替Tab
+set shiftwidth=4    " 设置 << 和 >> 命令移动时的宽度为4
+set softtabstop=4
+set tabstop=4
+
+set listchars=tab:>-,eol:$
+
+au FileType html setl shiftwidth=2
+au FileType html setl tabstop=2
+au FileType python,go,vim,javascript setl shiftwidth=4
+au FileType python,go,vim,javascript setl tabstop=4
+au FileType java,php setl shiftwidth=4
+au FileType java,php setl tabstop=4 " 1个Tab代表4个空格
+
+" set smarttab    " 只在行首用Tab，其他地方的tab都用空格代替
+
+set lbr			" 不在单词中间断行
+set tw=500
+
+set ai "Auto indent
+set si "Smart indent
+set wrap "Wrap lines 自动换行
+
+" Switch buffers with Tab
+" map <C-Tab> :bn<CR>
+" map <S-Tab> :bp<CR>
+
+""""""""""""""""""""""""""""""
+" => Visual mode related
+""""""""""""""""""""""""""""""
+" Really useful!
+"  In visual mode when you press * or # to search for the current selection
+vnoremap <silent> * :call VisualSearch('f')<CR>
+vnoremap <silent> # :call VisualSearch('b')<CR>
+
+" When you press gv you vimgrep after the selected text
+vnoremap <silent> gv :call VisualSearch('gv')<CR>
+map <leader>f :vimgrep // **/*.<left><left><left><left><left><left><left>
+
+function! CmdLine(str)
+    exe "menu Foo.Bar :" . a:str
+    emenu Foo.Bar
+    unmenu Foo
+endfunction
+
+" From an idea by Michael Naumann
+function! VisualSearch(direction) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+
+    let l:pattern = escape(@", '\\/.*$^~[]')
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+    if a:direction == 'b'
+        execute "normal ?" . l:pattern . "^M"
+    elseif a:direction == 'gv'
+        call CmdLine("vimgrep " . '/'. l:pattern . '/' . ' **/*.')
+    elseif a:direction == 'f'
+        execute "normal /" . l:pattern . "^M"
+    endif
+
+    let @/ = l:pattern
+    let @" = l:saved_reg
+endfunction
+
+" Normal与Visual模式时，可用Tab与Shift Tab做缩排
+" nmap <tab> v>
+" nmap <s-tab> v<
+
+" vmap <tab> >gv
+" vmap <s-tab> <gv
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Command mode related
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Smart mappings on the command line
+cno $h e ~/
+cno $d e ~/Desktop/
+cno $j e ./
+cno $c e <C-\>eCurrentFileDir("e")<cr>
+
+" $q is super useful when browsing on the command line
+cno $q <C-\>eDeleteTillSlash()<cr>
+
+" Bash like keys for the command line
+cnoremap <C-A>      <Home>
+cnoremap <C-E>      <End>
+"cnoremap <C-K>      <C-U>
+
+cnoremap <C-J> <Up>
+cnoremap <C-K> <Down>
+
+func! Cwd()
+  let cwd = getcwd()
+  return "e " . cwd
+endfunc
+
+func! DeleteTillSlash()
+  let g:cmd = getcmdline()
+  if MySys() == "linux" || MySys() == "mac"
+    let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*", "\\1", "")
+  else
+    let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\]\\).*", "\\1", "")
+  endif
+  if g:cmd == g:cmd_edited
+    if MySys() == "linux" || MySys() == "mac"
+      let g:cmd_edited = substitute(g:cmd, "\\(.*\[/\]\\).*/", "\\1", "")
+    else
+      let g:cmd_edited = substitute(g:cmd, "\\(.*\[\\\\\]\\).*\[\\\\\]", "\\1", "")
+    endif
+  endif
+  return g:cmd_edited
+endfunc
+
+func! CurrentFileDir(cmd)
+  return a:cmd . " " . expand("%:p:h") . "/"
+endfunc
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Moving around, tabs and buffers
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Map space to / (search) and c-space to ? (backgwards search)
+"map <space> /
+"map <c-space> ?
+map <silent> <leader><cr> :noh<cr>
+
+" Smart way to move btw. windows
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" Close the current buffer
+map <leader>bd :Bclose<cr>
+
+" Close all the buffers
+map <leader>ba :1,300 bd!<cr>
+
+" Use the arrows to something usefull
+map <right> :bn<cr>
+map <left> :bp<cr>
+
+" Tab configuration
+map <leader>tn :tabnew<cr>
+map <leader>te :tabedit
+map <leader>tc :tabclose<cr>
+map <leader>tm :tabmove
+
+" When pressing <leader>cd switch to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>
+
+
+command! Bclose call <SID>BufcloseCloseIt()
+function! <SID>BufcloseCloseIt()
+   let l:currentBufNum = bufnr("%")
+   let l:alternateBufNum = bufnr("#")
+
+   if buflisted(l:alternateBufNum)
+     buffer #
+   else
+     bnext
+   endif
+
+   if bufnr("%") == l:currentBufNum
+     new
+   endif
+
+   if buflisted(l:currentBufNum)
+     execute("bdelete! ".l:currentBufNum)
+   endif
+endfunction
+
+" Specify the behavior when switching between buffers
+try
+  set switchbuf=usetab "打开缓冲时在原来的窗口打开
+  set stal=1 "至少有两个标签页时才显示标签栏
+catch
+endtry
+
+
+""""""""""""""""""""""""""""""
+" => Statusline
+""""""""""""""""""""""""""""""
+set laststatus=1 "是否显示状态栏  2 表示显示
+set statusline=\ \ %F  "文件完整路径
+set statusline+=\ %m   "是否被修改
+set statusline+=\ %r   "是否是只读
+set statusline+=\ %h   "是否是帮助文档
+set statusline+=\ %w   "是否是预览窗口
+set statusline+=\ [%{strlen(&ft)?&ft:'none'} "文件类型
+set statusline+=,\ %{&fileencoding}  "文件编码
+set statusline+=,\ %{&fileformat}]  "文件格式
+set statusline+=\ \ \ CWD:\ %r%{getcwd()}%h "显示当前工作目录
+set statusline+=\ \ \ Line:\ %l/%L:%c  "行号\总行号:列号
+
+" <leader>hs 隐藏status，<leader>ss显示status
+map <silent> <leader>hs :set laststatus=1<CR>
+map <silent> <leader>ss :set laststatus=2<CR>
+
+" Always hide the statusline
+"set laststatus=1
+
+" Format the statusline
+"set statusline=\ %{HasPaste()}%F%m%r%h\ %w\ \ CWD:\ %r%{CurDir()}%h\ \ \ Line:\ %l/%L:%c
+
+
+function! CurDir()
+    let curdir = substitute(getcwd(), '/Users/amir/', "~/", "g")
+    return curdir
+endfunction
+
+function! HasPaste()
+    if &paste
+        return 'PASTE MODE  '
+    else
+        return ''
+    endif
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Parenthesis/bracket expanding
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"vnoremap $1 <esc>`>a)<esc>`<i(<esc>
+"vnoremap $2 <esc>`>a]<esc>`<i[<esc>
+"vnoremap $3 <esc>`>a}<esc>`<i{<esc>
+"vnoremap $$ <esc>`>a"<esc>`<i"<esc>
+"vnoremap $q <esc>`>a'<esc>`<i'<esc>
+"vnoremap $e <esc>`>a"<esc>`<i"<esc>
+
+" Map auto complete of (, ", ', [	通过auto-pairs.vim插件实现
+"inoremap $1 ()<esc>i
+"inoremap $2 []<esc>i
+"inoremap $3 {}<esc>i
+"inoremap $4 {<esc>o}<esc>O
+"inoremap $q ''<esc>i
+"inoremap $e ""<esc>i
+"inoremap $t <><esc>i
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General Abbrevs
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"iab xdate <c-r>=strftime("%d/%m/%y %H:%M:%S")<cr>
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Editing mappings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Move a line of text using ALT+[jk] or Comamnd+[jk] on mac
+" 把当前行下移或上移一行
+nmap <M-j> mz:m+<cr>`z
+nmap <M-k> mz:m-2<cr>`z
+vmap <M-j> :m'>+<cr>`<my`>mzgv`yo`z
+vmap <M-k> :m'<-2<cr>`>my`<mzgv`yo`z
+
+if MySys() == "mac"
+  nmap <D-j> <M-j>
+  nmap <D-k> <M-k>
+  vmap <D-j> <M-j>
+  vmap <D-k> <M-k>
+endif
+
+"Delete trailing white space, useful for Python ;)
+func! DeleteTrailingWS()
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
+endfunc
+autocmd BufWrite *.py :call DeleteTrailingWS()
+
+set guitablabel=%t
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Cope
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Do :help cope if you are unsure what cope is. It's super useful!
+map <leader>cc :botright cope<cr>
+map <leader>cn :cn<cr>
+map <leader>cp :cp<cr>
+
+
+""""""""""""""""""""""""""""""
+" => bufExplorer plugin
+""""""""""""""""""""""""""""""
+let g:bufExplorerDefaultHelp=0
+let g:bufExplorerShowRelativePath=1
+
+map <leader>o :BufExplorer<cr>
+
+
+""""""""""""""""""""""""""""""
+" => Minibuffer plugin
+""""""""""""""""""""""""""""""
+"let g:miniBufExplModSelTarget = 1
+"let g:miniBufExplorerMoreThanOne = 2
+"let g:miniBufExplModSelTarget = 0
+"let g:miniBufExplUseSingleClick = 1
+"let g:miniBufExplMapWindowNavVim = 1
+"let g:miniBufExplVSplit = 25
+"let g:miniBufExplSplitBelow=1
+
+"let g:bufExplorerSortBy = "name"
+
+"autocmd BufRead,BufNew :call UMiniBufExplorer
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Omni complete functions
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd FileType css set omnifunc=csscomplete#CompleteCSS
+imap <A-/> <c-x><c-o>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Spell checking
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"Pressing ,sp swill toggle and untoggle spell checking
+map <leader>sp s:setlocal spell!<cr>
+
+"Shortcuts using <leader>
+map <leader>sn ]s
+map <leader>sp [s
+map <leader>sa zg
+map <leader>s? z=
+
+
+""""""""""""""""""""""""""""""
+" => Python section
+""""""""""""""""""""""""""""""
+let python_highlight_all = 1
+au FileType python syn keyword pythonDecorator True None False self
+
+au BufNewFile,BufRead *.jinja set syntax=htmljinja
+au BufNewFile,BufRead *.mako set ft=mako
+
+au FileType python inoremap <buffer> $r return
+au FileType python inoremap <buffer> $i import
+au FileType python inoremap <buffer> $p print
+au FileType python inoremap <buffer> $f #--- PH ----------------------------------------------<esc>FP2xi
+au FileType python map <buffer> <leader>1 /class
+au FileType python map <buffer> <leader>2 /def
+au FileType python map <buffer> <leader>C ?class
+au FileType python map <buffer> <leader>D ?def
+
+" => execute current python file
+function! PythonExecute()
+	if &filetype!="python"
+		echohl WarningMsg | echo "Fail to check syntax! Please select the right file!" | echohl None
+		return
+	endif
+	if &filetype=="python"
+		" Parse and execute current python file
+		setlocal makeprg=python\ -u
+
+		" Use error format for parsing PYTHON error output
+		"setlocal errorformat=%C\ %.%#,%A\ \ File\ \"%f\"\\,\ line\ %l%.%#,%Z%[%^\ ]%\\@=%m
+	endif
+	execute "silent make %"
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+
+au FileType python map <A-2> :call PythonExecute()<CR>
+au FileType python imap <A-2> <ESC>:call PythonExecute()<CR>
+
+""""""""""""""""""""""""""""""
+" => JavaScript section
+"""""""""""""""""""""""""""""""
+"au FileType javascript call JavaScriptFold()
+au FileType javascript setl fen
+au FileType javascript setl nocindent
+
+au FileType javascript imap <c-t> AJS.log();<esc>hi
+au FileType javascript imap <c-a> alert();<esc>hi
+
+au FileType javascript inoremap <buffer> $r return
+au FileType javascript inoremap <buffer> $f //--- PH ----------------------------------------------<esc>FP2xi
+
+if exists('&foldmethod')
+	function! JavaScriptFold()
+		setl foldmethod=syntax
+		setl foldlevelstart=1
+		syn region foldBraces start=/{/ end=/}/ transparent fold keepend extend
+
+		function! FoldText()
+			return substitute(getline(v:foldstart), '{.*', '{...}', '')
+		endfunction
+		setl foldtext=FoldText()
+	endfunction
+endif
+
+""""""""""""""""""""""""""""""
+" => Command-T
+""""""""""""""""""""""""""""""
+"let g:CommandTMaxHeight = 15
+"set wildignore+=*.o,*.obj,.git,*.pyc
+"noremap <leader>j :CommandT<cr>
+"noremap <leader>y :CommandTFlush<cr>
+
+
+""""""""""""""""""""""""""""""
+" => Vim grep
+""""""""""""""""""""""""""""""
+let Grep_Skip_Dirs = 'RCS CVS SCCS .svn generated'
+set grepprg=/bin/grep\ -nH
+
+""""""""""""""""""""""""""""""
+" => 自动完成html标签的输入
+""""""""""""""""""""""""""""""
+
+function! InsertHtmlTag()
+        let pat = '\c<\w\+\s*\(\s\+\w\+\s*=\s*[''#$;,()."a-z0-9]\+\)*\s*>'
+        normal! a>
+        let save_cursor = getpos('.')
+        let result = matchstr(getline(save_cursor[1]), pat)
+        "if (search(pat, 'b', save_cursor[1]) && searchpair('<','','>','bn',0,  getline('.')) > 0)
+        if (search(pat, 'b', save_cursor[1]))
+           normal! lyiwf>
+           normal! a</
+           normal! p
+           normal! a>
+        endif
+        :call cursor(save_cursor[1], save_cursor[2], save_cursor[3])
+endfunction
+
+"inoremap > <ESC>:call InsertHtmlTag()<CR>	" 怎么做到只有html文件才自动输入标签
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => closetag plugin
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 不是搜有文件类型都载入的插件放入：notautopl文件夹
+if filereadable($VIM . '/vimfiles/plugin/closetag')
+    let g:closetag_html_style=1
+    au FileType html,xml,xsl,xhtml,php source $VIM/vimfiles/plugin/closetag.vim
+endif
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => MISC
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Remove the Windows ^M - when the encodings gets messed up
+noremap <Leader>mm mmHmt:%s/<C-V><cr>//ge<cr>'tzt'm
+
+"Quickly open a buffer for scripbble
+map <leader>eb :e ~/buffer<cr>
+au BufRead,BufNewFile ~/buffer iab <buffer> xh1 ===========================================
+
+"map <leader>pp :setlocal paste!<cr>
+
+map <leader>bb :cd ..<cr>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => AuthorInfo plugin
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vimrc_author='XuXinhua'
+let g:vimrc_email='xuxinhua@360.cn'
+let g:vimrc_homepage='http://www.360.cn'
+
+nmap <F4> :AuthorInfoDetect<cr>
+
+""""""""""""""""""""""""""""""
+" => mark plugin
+""""""""""""""""""""""""""""""
+nmap <silent> <leader>hl <Plug>MarkSet
+vmap <silent> <leader>hl <Plug>MarkSet
+nmap <silent> <leader>hh <Plug>MarkClear
+vmap <silent> <leader>hh <Plug>MarkClear
+nmap <silent> <leader>hr <Plug>MarkRegex
+vmap <silent> <leader>hr <Plug>MarkRegex
+
+""""""""""""""""""""""""""""""
+" => NERDTree
+""""""""""""""""""""""""""""""
+" 当设置显示相对行号时，NERDTree也会显示相对行号，不让显示
+function! NerdTreeToggle()
+    execute 'normal :'
+    execute 'NERDTreeToggle'
+    if exists('&relativenumber') && bufwinnr(t:NERDTreeBufName) != -1
+        set norelativenumber
+    endif
+endfunction
+map <F2> :call NerdTreeToggle()<CR>
+" 切换当前文件所在目录为tree
+map <F4> :NERDTree %:h<CR>
+" 设置NERDTree窗口的宽度
+let NERDTreeWinSize = 20
+
+""""""""""""""""""""""""""""""
+" => taglist plugin
+""""""""""""""""""""""""""""""
+" 递归查找tags文件
+set tags=tags;
+	if exists('&autochdir')
+		set autochdir
+	endif
+" set tags=tags,./tags
+
+let Tlist_Auto_Highlight_Tag = 1
+let Tlist_Auto_Open = 0
+let Tlist_Auto_Update = 1
+let Tlist_Close_On_Select = 0 
+let Tlist_Compact_Format = 0
+let Tlist_Display_Prototype = 0
+let Tlist_Display_Tag_Scope = 1
+let Tlist_Enable_Fold_Column = 0
+let Tlist_Exit_OnlyWindow = 0
+let Tlist_File_Fold_Auto_Close = 1
+let Tlist_GainFocus_On_ToggleOpen = 1
+let Tlist_Hightlight_Tag_On_BufEnter = 1
+let Tlist_Inc_Winwidth = 0
+let Tlist_Max_Submenu_Items = 1
+let Tlist_Max_Tag_Length = 30
+let Tlist_Process_File_Always = 0
+let Tlist_Show_Menu = 0
+let Tlist_Show_One_File = 1            "不同时显示多个文件的tag，只显示当前文件的
+let Tlist_Sort_Type = "order"
+let Tlist_Use_Horiz_Window = 0
+let Tlist_Use_Right_Window = 1		"在右侧窗口中显示taglist窗口
+let Tlist_WinWidth = 30
+let tlist_php_settings = 'php;c:class;i:interfaces;d:constant;f:function'
+
+" 当设置显示相对行号时，taglist也会显示相对行号，不让显示
+function! TagListToggle()
+    execute 'normal :'
+    execute 'TlistToggle'
+    if exists('&relativenumber') && bufwinnr(g:TagList_title) != -1
+        set norelativenumber
+    endif
+endfunction
+
+map <F9> :call TagListToggle()<CR>
+
+""""""""""""""""""""""""""""""
+" => txtBrowser插件
+""""""""""""""""""""""""""""""
+au BufEnter *.txt setlocal ft=txt
+nmap <silent> <F8> <ESC>:Tlist<CR>
+noremap <silent> <leader>u <ESC>:TlistUpdate<CR>
+let TxtBrowser_Dict_Url='http://dict.cn/text'
+
+""""""""""""""""""""""""""""""
+" => FindEverything插件
+""""""""""""""""""""""""""""""
+if has("win32") || has("win64")
+	let g:fe_es_exe='d:\ProgramFiles\Everything\es.exe'
+	map <F3> <ESC>:FE<CR>
+	map <leader>fe <ESC>:FE<CR>
+endif
+
+""""""""""""""""""""""""""""""
+" => Calendar插件
+""""""""""""""""""""""""""""""
+map ca <ESC>:Calendar<CR>
+
+""""""""""""""""""""""""""""""
+" => Lookup File
+" Author: happyvim
+" Function: ProjectTagUpdateLookupFile
+" Args:
+" Description: regenerate lookupfile tags
+""""""""""""""""""""""""""""""
+function! ProjectTagUpdateLookupFile()
+  echo "generate lookupfile.tag"
+  if filereadable(g:project_lookup_file)
+    call delete(g:project_lookup_file)
+  endif
+  execute "cd " .  g:this_project_base_dir
+  let l:lookup_tags = ["!_TAG_FILE_SORTED	2	//2=foldcase//"] 
+
+  if has("win32")
+    let l:this_project_base_dir = substitute(g:this_project_base_dir, "/", "//", "g") . "//"
+  else
+    let l:this_project_base_dir = g:this_project_base_dir
+  endif
+  "let l:lookup_tags_file_string = system(g:project_find_program . " " . l:this_project_base_dir . " " . g:project_find_param)
+  let l:lookup_tags_file_string = system(g:project_find_program . " " . g:project_find_param)
+  let l:lookup_tags_file_list = split(l:lookup_tags_file_string, '/n')
+  let l:lookup_tags_file_list = sort(l:lookup_tags_file_list)
+
+  let l:item = ""
+  let l:count = 0 
+  for l:item in l:lookup_tags_file_list
+    let l:item = fnamemodify(l:item, ':t') . "/t" . l:item . "/t" . "1"
+    let l:lookup_tags_file_list[l:count] = l:item
+    let l:count = l:count + 1
+  endfor 
+  call extend(l:lookup_tags, l:lookup_tags_file_list)
+  call writefile(l:lookup_tags, g:project_lookup_file)
+  echo "generate lookupfile tag done"
+endfunction
+
+"dir /B /S /A-D /ON *.fnc *.prc *.trg *.pck *.typ *.spc *.bdy *.tps *.tpb *.txt *.sql > lookuptags
+"dir /B /S /A-D /ON | findstr /V ".class$ .xls$ .doc$ .ppt$ .pdf$ .jpg$ .gif$ .zip$ .rar$ .jar$ .dat$ .mdb$ .dmp$ " > lookuptags
+let g:project_lookup_file = "E:/kx_doc/kaixin/lookuptags"
+let g:project_find_program = "dir /B /S /A-D /ON"
+let g:project_find_param = "*.php *.html"
+let g:this_project_base_dir = "E:/kx_doc/kaixin"
+
+let g:LookupFile_TagExpr = '"E:/kx_doc/kaixin/lookuptags"'
+
+"映射LookupFile为,lk（会在tag文件中查找指定的文件名）
+nmap <silent> <leader>lk :LUTags<cr>
+"映射LUBufs为,ll（会在当前已打开的buffer中查找指定名字的buffer）
+nmap <silent> <leader>ll :LUBufs<cr>
+"映射LUWalk为,lu（会在指定目录结构中查找）
+nmap <silent> <leader>lu :LUWalk<cr>
+
+nmap <silent> <leader>ul :call ProjectTagUpdateLookupFile()<cr>
+
+""""""""""""""""""""""""""""""
+" => winManager plugin setting
+""""""""""""""""""""""""""""""
+"let g:winManagerWindowLayout = "BufExplorer,FileExplorer|TagList"
+"let g:winManagerWidth = 30
+"let g:defaultExplorer = 0
+"nmap <C-W><C-F> :FirstExplorerWindow<cr>
+"nmap <C-W><C-B> :BottomExplorerWindow<cr>
+"nmap <silent> <leader>wm :WMToggle<cr>
+
+""""""""""""""""""""""""""""""
+" => YankRing 插件配置
+""""""""""""""""""""""""""""""
+:nnoremap <silent> <F10> :YRShow<CR>
+
+""""""""""""""""""""""""""""""
+" => MRU 插件配置（最近打开的文件列表）
+""""""""""""""""""""""""""""""
+:nnoremap <silent> <F11> :MRU<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => PHP PYTHON JS CSS的函数字典
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd filetype javascript set dictionary=$VIM/dict/javascript.dict
+autocmd filetype css set dictionary=$VIM/dict/css.dict
+autocmd filetype php set dictionary=$VIM/dict/php.dict
+autocmd filetype python set dictionary=$VIM/dict/complete-dict
+autocmd filetype go set dictionary=$VIM/dict/go.dict
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => PHP编辑器设置
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"map <A-1> :!php -l %<cr>  " 最简单的
+
+"检查当前文件代码语法(php){{{
+function! PhpCheckSyntax()
+	if &filetype!="php"
+		echohl WarningMsg | echo "Fail to check syntax! Please select the right file!" | echohl None
+		return
+	endif
+	if &filetype=="php"
+		" Check php syntax
+		setlocal makeprg=\"php\"\ -l\ -n\ -d\ html_errors=off
+		" Set shellpipe
+		setlocal shellpipe=>
+		" Use error format for parsing PHP error output
+		setlocal errorformat=%m\ in\ %f\ on\ line\ %l
+	endif
+	execute "silent make %"
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+au FileType php map <A-1> :call PhpCheckSyntax()<CR>
+au FileType php imap <A-1> <ESC>:call PhpCheckSyntax()<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Parse and execute current php file
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! PhpParseExecute()
+	if &filetype!="php"
+		echohl WarningMsg | echo "Fail to check syntax! Please select the right file!" | echohl None
+		return
+	endif
+	if &filetype=="php"
+		" Parse and execute current php file
+		setlocal makeprg=\"php\" 
+
+		" Set shellpipe
+		setlocal shellpipe=>
+
+		" Use error format for parsing PHP error output
+		setlocal errorformat=%m\ in\ %f\ on\ line\ %l
+	endif
+	execute "silent make %"
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+
+au FileType php map <A-2> :call PhpParseExecute()<CR>
+au FileType php imap <A-2> <ESC>:call PhpParseExecute()<CR>
+
+" 退出quickfix窗口
+map <A-3> :cclose<cr>
+"}}}
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => execute current go file
+"""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! GoParseExecute()
+	if &filetype!="go"
+		echohl WarningMsg | echo "Fail to check syntax! Please select the right file!" | echohl None
+		return
+	endif
+	if &filetype=="go"
+		" Parse and execute current go file
+		setlocal makeprg=\"go\ run\" 
+
+		" Set shellpipe
+		setlocal shellpipe=>
+
+		" Use error format for parsing go error output
+		setlocal errorformat=%m\ in\ %f\ on\ line\ %l
+	endif
+	execute "silent make %"
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+
+function! GoFmtExecute()
+	if &filetype!="go"
+		return
+	endif
+	if &filetype=="go"
+		setlocal makeprg=\"gofmt\ -tabs=false\ -tabwidth=4\ -w\" 
+        execute "silent make %"
+        set makeprg=make
+	endif
+endfunction
+
+
+au FileType go map <A-2> :call GoParseExecute()<CR>
+au FileType go imap <A-2> <ESC>:call GoParseExecute()<CR>
+
+" godoc支持，按K出现帮助文档
+autocmd FileType go set keywordprg="godoc"
+
+" 保存时格式化Go代码
+autocmd BufWritePost *.go :call GoFmtExecute()
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => 会话相关 session
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 以下配置希望session文件所在的目录自动成为当前工作目录
+set sessionoptions-=curdir        "在session option中去掉curdir
+set sessionoptions+=sesdir        "在session option中加入sesdir
+set sessionoptions+=resize,winpos	"在session option中加入resize,winpos
+
+function! SaveWork()
+	" 创建会话文件
+	mksession work_sessionfile.vim
+	" 创建一个viminfo文件
+	wviminfo work_viminfo.viminfo
+endfunction
+
+function! LoadWork()
+	" 载入会话文件
+	source work_sessionfile.vim
+	" 载入viminfo文件
+	rviminfo work_viminfo.viminfo
+endfunction
+
+nmap <leader>sw :call SaveWork()<cr>
+
+nmap <leader>lw :call LoadWork()<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => NERD_comment相关"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let NERD_java_alt_style=1
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Markdown 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let g:vim_markdown_folding_disabled=1
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Shortcuts
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" 取消高亮
+nmap <leader>nh :nohlsearch<cr>
+
+" 关闭当前窗口或标签
+map <leader>c :close<cr>
+
+" 新建Tab
+map <leader>t :tabnew<cr>
+
+" 全选
+nmap <C-A> ggvG$
+
+"语法识别
+map <leader>cyy :set syntax=c<cr>
+map <leader>cpp :set syntax=cpp<cr>
+map <leader>py :set syntax=py<cr>
+map <leader>php :set syntax=php<cr>
+map <leader>go :set syntax=go<cr>
+map <leader>java :set syntax=java<cr>
+map <leader>js :set syntax=javascript<cr>
+map <leader>html :set syntax=html<cr>
+map <leader>pas :set syntax=pascal<cr>
+map <leader>vim :set syntax=vim<cr>
+autocmd BufEnter * :syntax sync fromstart
+
+" 加入帮助文件
+map <leader>ah :helptags $VIM/vimfiles/doc/<cr>
+
+" 默认粘贴到系统粘贴板
+"set clipboard=unnamed    "The * register is the default register
+
+
+if has("gui_running")
+    "set linespace=5"row space.
+    "set linespace=3 "row space.(两行的间距, 只对gvim有效.)
+    "autocmd FileType c,cpp :colorscheme evening
+
+    " Ctrl+S实现保存，如果未命名文件名会提示你选择保存路径和文件名
+    :map <silent> <C-S> :if expand("%") == ""<CR>:browse confirm w<CR>:else<CR>:confirm w<CR>:endif<CR>
+
+	" 不知是啥意思
+    " noremap <M-1> 1gt
+    " noremap <M-2> 2gt
+    " noremap <M-3> 3gt
+    " noremap <M-4> 4gt
+    " noremap <M-5> 5gt
+    " noremap <M-6> 6gt
+    " noremap <M-7> 7gt
+    " noremap <M-8> 8gt
+    " noremap <M-9> 9gt
+    " noremap <M-0> 10gt
+
+    if has("unix")
+        set encoding=utf8
+        set langmenu=zh_CN.UTF-8
+        set imcmdline
+        source $VIMRUNTIME/delmenu.vim
+        source $VIMRUNTIME/menu.vim
+        set guifont=Monospace\ 11 "set the gui font in Fedora.
+    else
+        "set guifont=新宋体:h11:cGB2312 "set the gui font in Windows XP
+    endif
+endif
+au BufNewFile,BufRead *.js,*.javascript,*.es,*.jsx	setf javascript
+
+if filereadable($VIM . '/vimfiles/ftplugin/json.vim')
+    au BufRead,BufNewFile *.json set filetype=json
+    au! Syntax json source $VIM/vimfiles/ftplugin/json.vim
+endif
+
+" upload file to server
+function! Upload2sever()
+    let config = g:prj_root . '\vim_sync2server.conf'
+	setlocal makeprg=\"php\" 
+	setlocal shellpipe=>
+	" Use error format for parsing PHP error output
+	setlocal errorformat=%m\ in\ %f\ on\ line\ %l
+	execute "silent make " . $VIM . '\custom_plugins\upload2server.php ' . config . " %:p"
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+
+map <A-4> :call Upload2sever()<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => SVN操作快捷键
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! Svn(type, isDir)
+    set encoding=gbk
+    let path = '%:p'
+
+    if a:isDir
+        let path = '%:p:h'
+    endif
+    
+	setlocal makeprg=\"svn\" 
+	setlocal shellpipe=>
+	execute "silent make " . a:type . " " . path 
+    set encoding=utf8
+	set makeprg=make
+	execute "normal :"
+	execute "copen"
+endfunction
+
+map <leader>af :call Svn("add", 0)<CR>
+map <leader>ad :call Svn("add", 1)<CR>
+map <leader>uf :call Svn("up", 0)<CR>
+map <leader>ud :call Svn("up", 1)<CR>
+map <leader>cf :call Svn("ci", 0)<CR>
+map <leader>ca :call Svn("ci", 1)<CR>
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 其他杂项快捷键
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" 插入当前时间
+imap <silent><leader>d <c-r>=strftime('%Y/%m/%d')<cr>
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" PATH设置相关，以方便编程打开文件
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let prj_root = ''
+if filereadable($VIM . '/temp')
+    source $VIM/temp
+endif
+
+
+" 先保存初始path的值
+let init_path = &path
+
+" 支持变量，很好！！
+let &path = &path . ',' . prj_root . '**'
+
+function! InitPath()
+    let &path=g:init_path
+endfunction
+
+map <silent><C-I> :call InitPath()<CR>
+
+function! SetPath()
+    let &path=g:init_path
+    let &path=&path . ',' . g:prj_root . '**'
+endfunction
+
+map <silent><leader>s :call SetPath()<CR>
+
+" 自动切换工作目录
+if exists('&autochdir')
+	set autochdir
+endif
+execute":cd " . prj_root
+
+" 设置 'suffixesadd' 选项可以用来查找文件所要附加的后缀
+set sua=.php,.java,.js,.html,.py,.go
+
+" easy emotion 插件
+let g:EasyMotion_leader_key = 'm'
+
+
+" peepopen插件"
+" let g:peepopen_quit = 0
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+"					GOLANG 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+au FileType go nmap <leader>r <Plug>(go-run)
+au FileType go nmap <leader>b <Plug>(go-build)
+au FileType go nmap <leader>n <Plug>(go-build)
+au FileType go nmap <leader>i <Plug>(go-info)
+au FileType go nmap <leader>t <Plug>(go-test)
+au FileType go nmap <leader>c <Plug>(go-coverage)
+au FileType go nmap <Leader>gd <Plug>(go-doc)
+au FileType go nmap <Leader>gv <Plug>(go-doc-vertical)
+au FileType go nmap gd <Plug>(go-def)
+au FileType go nmap <Leader>ds <Plug>(go-def-split)
+au FileType go nmap <Leader>dv <Plug>(go-def-vertical)
+au FileType go nmap <Leader>dt <Plug>(go-def-tab)
+
